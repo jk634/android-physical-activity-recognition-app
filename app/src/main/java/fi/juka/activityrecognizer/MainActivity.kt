@@ -4,8 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import fi.juka.accelerometer.Accelerometer
+import fi.juka.accelerometer.AccelerometerListener
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AccelerometerListener {
 
     private lateinit var accelerometer: Accelerometer
 
@@ -15,10 +16,21 @@ class MainActivity : AppCompatActivity() {
 
         accelerometer = Accelerometer(this)
 
+        accelerometer.register(this)
+
+    }
+
+    override fun onAccelerationChanged(acceleration: FloatArray) {
+        Log.d("TESTI", acceleration[2].toString())
     }
 
     override fun onResume() {
         super.onResume()
-        accelerometer.register()
+        accelerometer.register(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        accelerometer.unregister()
     }
 }
