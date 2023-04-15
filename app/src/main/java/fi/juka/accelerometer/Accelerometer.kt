@@ -13,6 +13,7 @@ class Accelerometer(context: Context) : SensorEventListener {
             SensorManager
     private var accelerometer: Sensor? = null
     private var acceleration: FloatArray = floatArrayOf(0f, 0f, 0f)
+    private var listener: AccelerometerListener? = null
 
     init {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -23,19 +24,20 @@ class Accelerometer(context: Context) : SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
 
-        // Checks if the incoming data is from the accelerometer. If so, clone it to the array.
+        // If true, clone it to the array and send it to the accelerometer listener
         if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
             acceleration = event.values.clone()
+            listener?.onAccelerationChanged(acceleration)
         }
-
-        Log.d("TEST", event!!.values[0].toString())
     }
 
-    // Registers accelerometer listener when called
-    fun register() {
+    // Registers the accelerometer listener when called
+    fun register(listener: AccelerometerListener) {
+        this.listener = listener
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
+    // Unregisters the accelerometer listener when no focus
     fun unregister() {
         sensorManager.unregisterListener(this)
     }
