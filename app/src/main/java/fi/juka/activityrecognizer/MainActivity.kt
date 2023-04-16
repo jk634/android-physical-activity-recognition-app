@@ -1,27 +1,34 @@
 package fi.juka.activityrecognizer
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.widget.Button
 import fi.juka.accelerometer.Accelerometer
 import fi.juka.accelerometer.AccelerometerListener
+import fi.juka.graphs.ChartActivity
+
 
 class MainActivity : AppCompatActivity(), AccelerometerListener {
 
     private lateinit var accelerometer: Accelerometer
+    private lateinit var acceleration: FloatArray
+    private lateinit var btnChart: Button
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        accelerometer = Accelerometer(this)
-
+        this.accelerometer = Accelerometer(this)
         accelerometer.register(this)
 
+        this.btnChart = findViewById(R.id.btnChart)
+        btnChart.setOnClickListener{chartClicked()}
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
-        Log.d("TESTI", acceleration[2].toString())
+        this.acceleration = acceleration
     }
 
     override fun onResume() {
@@ -32,5 +39,10 @@ class MainActivity : AppCompatActivity(), AccelerometerListener {
     override fun onPause() {
         super.onPause()
         accelerometer.unregister()
+    }
+
+    private fun chartClicked() {
+        val intent = Intent(this, ChartActivity::class.java)
+        startActivity(intent)
     }
 }
