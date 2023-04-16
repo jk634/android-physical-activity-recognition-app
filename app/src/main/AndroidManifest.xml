@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ActivityRecognizer">
         <activity
+            android:name="fi.juka.graphs.ChartActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
