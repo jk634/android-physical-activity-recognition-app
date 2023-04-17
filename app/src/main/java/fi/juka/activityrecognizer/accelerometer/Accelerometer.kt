@@ -1,4 +1,4 @@
-package fi.juka.accelerometer
+package fi.juka.activityrecognizer.accelerometer
 
 import android.content.Context
 import android.hardware.Sensor

@@ -4,9 +4,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import fi.juka.accelerometer.Accelerometer
-import fi.juka.accelerometer.AccelerometerListener
-import fi.juka.graphs.ChartActivity
+import fi.juka.activityrecognizer.accelerometer.Accelerometer
+import fi.juka.activityrecognizer.accelerometer.AccelerometerListener
+import fi.juka.activityrecognizer.graphs.ChartActivity
 
 
 class MainActivity : AppCompatActivity(), AccelerometerListener {

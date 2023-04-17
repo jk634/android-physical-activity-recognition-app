@@ -1,4 +1,4 @@
-package fi.juka.graphs
+package fi.juka.activityrecognizer.graphs
 
 import android.app.Activity
 import android.content.Context

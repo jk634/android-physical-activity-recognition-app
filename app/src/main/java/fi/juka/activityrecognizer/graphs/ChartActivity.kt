@@ -1,9 +1,9 @@
-package fi.juka.graphs
+package fi.juka.activityrecognizer.graphs
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import fi.juka.accelerometer.Accelerometer
-import fi.juka.accelerometer.AccelerometerListener
+import fi.juka.activityrecognizer.accelerometer.Accelerometer
+import fi.juka.activityrecognizer.accelerometer.AccelerometerListener
 import fi.juka.activityrecognizer.R
 
 class ChartActivity : AppCompatActivity(), AccelerometerListener {

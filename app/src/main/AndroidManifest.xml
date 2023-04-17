@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ActivityRecognizer">
         <activity
-            android:name="fi.juka.graphs.ChartActivity"
+            android:name=".graphs.ChartActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
         <activity
