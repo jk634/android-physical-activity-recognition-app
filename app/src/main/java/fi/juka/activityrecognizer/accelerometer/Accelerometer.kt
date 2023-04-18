@@ -5,7 +5,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
+import fi.juka.activityrecognizer.interfaces.AccelerometerListener
 
 class Accelerometer(context: Context) : SensorEventListener {
 
@@ -35,7 +35,7 @@ class Accelerometer(context: Context) : SensorEventListener {
     // Register the accelerometer listener when called
     fun register(listener: AccelerometerListener) {
         this.listener = listener
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI)
     }
 
     // Unregister the accelerometer listener when no focus

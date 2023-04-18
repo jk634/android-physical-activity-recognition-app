@@ -1,4 +1,4 @@
-package fi.juka.activityrecognizer.accelerometer
+package fi.juka.activityrecognizer.interfaces
 
 interface AccelerometerListener {
     fun onAccelerationChanged(acceleration: FloatArray)
