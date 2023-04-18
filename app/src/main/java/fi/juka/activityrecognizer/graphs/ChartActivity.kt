@@ -17,12 +17,12 @@ class ChartActivity : AppCompatActivity(), AccelerometerListener {
 
         this.accelerometer = Accelerometer(this)
         accelerometer.register(this)
-
         this.accelerationChartView = AccelerometerChartView(this)
     }
 
-    // Refresh the accelerationChartView with new values
+    // Filter data and refresh the accelerationChartView with new values
     override fun onAccelerationChanged(acceleration: FloatArray) {
+        accelerometer.filter(acceleration)
         accelerationChartView.update(acceleration[0], acceleration[1], acceleration[2])
     }
 
