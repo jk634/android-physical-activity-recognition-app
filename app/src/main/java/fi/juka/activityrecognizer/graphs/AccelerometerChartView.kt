@@ -26,7 +26,7 @@ class AccelerometerChartView(private val context: Context) {
 
         // Set the minimum and maximum values for the x and y axes
         viewport.setMinX(0.0)
-        viewport.setMaxX(100.0)
+        viewport.setMaxX(20.0)
         viewport.setMinY(-20.0)
         viewport.setMaxY(20.0)
 
