@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.widget.TextView
 import fi.juka.activityrecognizer.R
 import fi.juka.activityrecognizer.accelerometer.Accelerometer
 import fi.juka.activityrecognizer.database.TrainingContract
@@ -16,9 +16,10 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
 
     private lateinit var accelerometer: Accelerometer
     private lateinit var db: SQLiteDatabase
-    private lateinit var builder: DialogManager
     private lateinit var activityName: String
+    private lateinit var activityId: Integer
     private val dbHelper = TrainingDbHelper(this)
+    private lateinit var showTempActivity: TextView
 
     var flag = false
     //private lateinit var acceleration: FloatArray
@@ -27,6 +28,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_train)
 
+        this.showTempActivity = findViewById(R.id.tempActivity)
 
         this.accelerometer = Accelerometer(this)
         accelerometer.register(this)
@@ -42,24 +44,38 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
     // Makes whole dialog process
     private fun dialogHandler() {
         val dialogManager = DialogManager(this)
-        dialogManager.showDialog("Do training data", "Do you want to start taking training data?"
+        dialogManager.showDialog("Create Training Data", "Would you like to start " +
+                "taking training data?"
         ) {
-            dialogManager.showNameDialog("Give Activity name you are going to do") {
-                name ->
-                if (name != null) {
-                    saveActivity(name)
+            dialogManager.showNameDialog("Choose an existing activity or create a new one to " +
+                    "collect data", {
+                activityName ->
+                    if (activityName != null && activityName.isNotEmpty()) {
+                        val activityId = saveActivity(activityName)
+                        showTempActivity.text = "${activityName} ${activityId}"
                 }
+            }, {
+                activityId, activityName ->
+                    this.activityName = activityName
+                    this.activityId = activityId
+                    showTempActivity.text = "${activityName} ${activityId}"
             }
+            )
         }
     }
 
-    private fun saveActivity(name: String) {
+    private fun saveActivity(activityName: String): Int {
         this.db = dbHelper.writableDatabase
+        val formattedActivityName = activityName.lowercase().replace("\\s".toRegex(), "_")
+
         val values = ContentValues().apply {
-            put(TrainingContract.ActivityEntry.COLUMN_NAME_ACTIVITY, name)
+            put(TrainingContract.ActivityEntry.COLUMN_NAME_ACTIVITY, formattedActivityName)
         }
-        db.insert(TrainingContract.ActivityEntry.TABLE_NAME, null, values)
+        val id = db.insert(TrainingContract.ActivityEntry.TABLE_NAME, null, values)
+
         db.close()
+
+        return id.toInt()
     }
 
 
