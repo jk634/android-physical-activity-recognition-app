@@ -4,24 +4,30 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import fi.juka.activityrecognizer.R
 import fi.juka.activityrecognizer.accelerometer.Accelerometer
 import fi.juka.activityrecognizer.database.TrainingContract
 import fi.juka.activityrecognizer.database.TrainingDbHelper
 import fi.juka.activityrecognizer.interfaces.AccelerometerListener
 import fi.juka.activityrecognizer.utils.DialogManager
+import org.w3c.dom.Text
 
 class TrainActivity : AppCompatActivity(), AccelerometerListener {
 
     private lateinit var accelerometer: Accelerometer
     private lateinit var db: SQLiteDatabase
-    private lateinit var activityName: String
-    private lateinit var activityId: Integer
+    private var activityName: String? = null
+    private var activityId: Integer? = null
     private val dbHelper = TrainingDbHelper(this)
     private lateinit var showTempActivity: TextView
+    private lateinit var showTimer: TextView
+    private lateinit var startBtn: Button
 
-    var flag = false
     //private lateinit var acceleration: FloatArray
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,9 +37,12 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
         this.showTempActivity = findViewById(R.id.tempActivity)
 
         this.accelerometer = Accelerometer(this)
-        accelerometer.register(this)
+        this.startBtn = findViewById(R.id.btnStartSample)
+        this.showTimer = findViewById(R.id.showTimer)
 
         dialogHandler()
+        //initTrainView()
+        startBtn.setOnClickListener{startClicked()}
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
@@ -56,14 +65,19 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
                 }
             }, {
                 activityId, activityName ->
-                    this.activityName = activityName
-                    this.activityId = activityId
-                    showTempActivity.text = "${activityName} ${activityId}"
-            }
+                    if (activityId != null && activityName != null) {
+                        this.activityName = activityName
+                        this.activityId = activityId
+                    } else {
+                            this.activityName = null
+                            this.activityId = null
+                    }
+                }
             )
         }
     }
 
+    // Save the new Activity to the new row and return id
     private fun saveActivity(activityName: String): Int {
         this.db = dbHelper.writableDatabase
         val formattedActivityName = activityName.lowercase().replace("\\s".toRegex(), "_")
@@ -88,13 +102,42 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
         }*/
     }
 
+    /*private fun initTrainView() {
+        if (activityId != null && activityName != null) {
+            showTempActivity.text = "${activityName} ${activityId} number of samples: TODO"
+
+        } else {
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
+        }
+    } */
+
+    fun startClicked() {
+        startBtn.visibility = View.GONE
+        Thread {
+            var x = 0
+            accelerometer.register(this)
+            while (x < 10) {
+                runOnUiThread() {
+                    showTimer.text = (x + 1).toString()
+                }
+                Thread.sleep(1000)
+                x++
+            }
+            accelerometer.unregister()
+            runOnUiThread() {
+                showTimer.textSize = 50F
+                showTimer.text = "Completed"
+            }
+        }.start()
+    }
+
     override fun onResume() {
         super.onResume()
-        accelerometer.register(this)
+        //accelerometer.register(this)
     }
 
     override fun onPause() {
         super.onPause()
-        accelerometer.unregister()
+        //accelerometer.unregister()
     }
 }
