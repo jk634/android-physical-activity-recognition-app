@@ -3,14 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:gravity="center"
     tools:context=".activities.TrainActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tempActivity"/>
+        android:id="@+id/tempActivity"
+        android:textSize="50dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="top"/>
 
     <Button
         android:id="@+id/btnStartSample"
