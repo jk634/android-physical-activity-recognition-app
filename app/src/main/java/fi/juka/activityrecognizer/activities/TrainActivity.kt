@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import fi.juka.activityrecognizer.R
 import fi.juka.activityrecognizer.accelerometer.Accelerometer
+import fi.juka.activityrecognizer.database.ActivityDao
 import fi.juka.activityrecognizer.database.TrainingContract
 import fi.juka.activityrecognizer.database.TrainingDbHelper
 import fi.juka.activityrecognizer.interfaces.AccelerometerListener
@@ -22,11 +23,12 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
     private lateinit var accelerometer: Accelerometer
     private lateinit var db: SQLiteDatabase
     private var activityName: String? = null
-    private var activityId: Integer? = null
-    private val dbHelper = TrainingDbHelper(this)
+    private var activityId: Long? = null
+    private val dbHelper by lazy { TrainingDbHelper(this) }
     private lateinit var showTempActivity: TextView
     private lateinit var showTimer: TextView
     private lateinit var startBtn: Button
+    val activityDao = ActivityDao(dbHelper)
 
     //private lateinit var acceleration: FloatArray
 
@@ -41,13 +43,15 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
         this.showTimer = findViewById(R.id.showTimer)
 
         dialogHandler()
-        //initTrainView()
         startBtn.setOnClickListener{startClicked()}
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
+
+        showTempActivity.text = "${acceleration[0]} ${acceleration[1]} ${acceleration[2]}"
         //this.acceleration = acceleration
         //saveData(acceleration)
+
     }
 
     // Makes whole dialog process
@@ -60,14 +64,16 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
                     "collect data", {
                 activityName ->
                     if (activityName != null && activityName.isNotEmpty()) {
-                        val activityId = saveActivity(activityName)
-                        showTempActivity.text = "${activityName} ${activityId}"
+                        activityId = activityDao.saveActivityAndGetId(activityName)
+                        showTempActivity.text = "$activityName"
+
                 }
             }, {
                 activityId, activityName ->
                     if (activityId != null && activityName != null) {
                         this.activityName = activityName
                         this.activityId = activityId
+                        showTempActivity.text = "${activityName}"
                     } else {
                             this.activityName = null
                             this.activityId = null
@@ -77,42 +83,9 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
         }
     }
 
-    // Save the new Activity to the new row and return id
-    private fun saveActivity(activityName: String): Int {
-        this.db = dbHelper.writableDatabase
-        val formattedActivityName = activityName.lowercase().replace("\\s".toRegex(), "_")
-
-        val values = ContentValues().apply {
-            put(TrainingContract.ActivityEntry.COLUMN_NAME_ACTIVITY, formattedActivityName)
-        }
-        val id = db.insert(TrainingContract.ActivityEntry.TABLE_NAME, null, values)
-
-        db.close()
-
-        return id.toInt()
-    }
-
-
-    fun saveData(acceleration: FloatArray) {
-        /*val values = ContentValues().apply {
-            put(TrainingContract.TrainingDataEntry.COLUMN_NAME_TIMESTAMP, System.currentTimeMillis())
-            put(TrainingContract.TrainingDataEntry.COLUMN_NAME_X_AXIS,acceleration[0])
-            put(TrainingContract.TrainingDataEntry.COLUMN_NAME_Y_AXIS,acceleration[1])
-            put(TrainingContract.TrainingDataEntry.COLUMN_NAME_Z_AXIS, acceleration[2])
-        }*/
-    }
-
-    /*private fun initTrainView() {
-        if (activityId != null && activityName != null) {
-            showTempActivity.text = "${activityName} ${activityId} number of samples: TODO"
-
-        } else {
-            Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
-        }
-    } */
-
     fun startClicked() {
         startBtn.visibility = View.GONE
+        showTempActivity.textSize = 20f
         Thread {
             var x = 0
             accelerometer.register(this)
