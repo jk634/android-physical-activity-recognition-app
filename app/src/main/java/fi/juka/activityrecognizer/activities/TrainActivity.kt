@@ -28,7 +28,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
     private lateinit var showTempActivity: TextView
     private lateinit var showTimer: TextView
     private lateinit var startBtn: Button
-    val activityDao = ActivityDao(dbHelper)
+    private val activityDao = ActivityDao(dbHelper)
 
     //private lateinit var acceleration: FloatArray
 
@@ -42,6 +42,8 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
         this.startBtn = findViewById(R.id.btnStartSample)
         this.showTimer = findViewById(R.id.showTimer)
 
+        //dbHelper.deleteAllTables()
+
         dialogHandler()
         startBtn.setOnClickListener{startClicked()}
     }
@@ -50,7 +52,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
 
         showTempActivity.text = "${acceleration[0]} ${acceleration[1]} ${acceleration[2]}"
         //this.acceleration = acceleration
-        //saveData(acceleration)
+        activityDao.saveData(acceleration, activityId!!)
 
     }
 
@@ -100,6 +102,9 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
             runOnUiThread() {
                 showTimer.textSize = 50F
                 showTimer.text = "Completed"
+                activityDao.incrementSampleCount(activityId!!)
+                activityDao.getAllTrainingDataForActivity(activityId!!)
+
             }
         }.start()
     }
