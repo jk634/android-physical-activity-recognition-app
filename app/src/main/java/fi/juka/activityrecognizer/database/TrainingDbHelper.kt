@@ -17,6 +17,15 @@ class TrainingDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NA
         onCreate(db)
     }
 
+    // Be careful with this function
+    fun deleteAllTables() {
+        val db = writableDatabase
+        db.execSQL(TrainingContract.TrainingDataEntry.SQL_DROP_TABLE)
+        db.execSQL(TrainingContract.ActivityEntry.SQL_DROP_TABLE)
+        onCreate(db)
+        db.close()
+    }
+
     companion object {
         const val DATABASE_VERSION = 1
         const val DATABASE_NAME = "Training.db"
