@@ -29,6 +29,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
     private lateinit var showTimer: TextView
     private lateinit var startBtn: Button
     private val activityDao = ActivityDao(dbHelper)
+    private val accelerationData = mutableListOf<FloatArray>()
 
     //private lateinit var acceleration: FloatArray
 
@@ -44,45 +45,17 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
 
         //dbHelper.deleteAllTables()
 
-        dialogHandler()
+        activityChoiseDialogHandler()
         startBtn.setOnClickListener{startClicked()}
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
-
+        accelerationData.add(acceleration)
         showTempActivity.text = "${acceleration[0]} ${acceleration[1]} ${acceleration[2]}"
         //this.acceleration = acceleration
-        activityDao.saveData(acceleration, activityId!!)
 
-    }
+        //activityDao.saveData(acceleration, activityId!!)
 
-    // Makes whole dialog process
-    private fun dialogHandler() {
-        val dialogManager = DialogManager(this)
-        dialogManager.showDialog("Create Training Data", "Would you like to start " +
-                "taking training data?"
-        ) {
-            dialogManager.showNameDialog("Choose an existing activity or create a new one to " +
-                    "collect data", {
-                activityName ->
-                    if (activityName != null && activityName.isNotEmpty()) {
-                        activityId = activityDao.saveActivityAndGetId(activityName)
-                        showTempActivity.text = "$activityName"
-
-                }
-            }, {
-                activityId, activityName ->
-                    if (activityId != null && activityName != null) {
-                        this.activityName = activityName
-                        this.activityId = activityId
-                        showTempActivity.text = "${activityName}"
-                    } else {
-                            this.activityName = null
-                            this.activityId = null
-                    }
-                }
-            )
-        }
     }
 
     fun startClicked() {
@@ -102,11 +75,52 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
             runOnUiThread() {
                 showTimer.textSize = 50F
                 showTimer.text = "Completed"
-                activityDao.incrementSampleCount(activityId!!)
-                activityDao.getAllTrainingDataForActivity(activityId!!)
+                //activityDao.incrementSampleCount(activityId!!)
+                //activityDao.getAllTrainingDataForActivity(activityId!!)
+                saveDataDialogHandler()
 
             }
         }.start()
+    }
+
+    // Makes whole dialog process
+    private fun activityChoiseDialogHandler() {
+        val dialogManager = DialogManager(this)
+        dialogManager.showActivityDialog("Create Training Data", "Would you like to start " +
+                "taking training data?"
+        ) {
+            dialogManager.showNameDialog("Choose an existing activity or create a new one to " +
+                    "collect data", {
+                    activityName ->
+                if (activityName != null && activityName.isNotEmpty()) {
+                    activityId = activityDao.saveActivityAndGetId(activityName)
+                    showTempActivity.text = "$activityName"
+
+                }
+            }, {
+                    activityId, activityName ->
+                if (activityId != null && activityName != null) {
+                    this.activityName = activityName
+                    this.activityId = activityId
+                    showTempActivity.text = "${activityName}"
+                } else {
+                    this.activityName = null
+                    this.activityId = null
+                }
+            }
+            )
+        }
+    }
+
+    fun saveDataDialogHandler() {
+        val dialog = DialogManager(this)
+
+        dialog.showSaveDialog("Do you want to save this sample?") {
+            activityDao.saveData(accelerationData, activityId!!)
+            activityDao.incrementSampleCount(activityId!!)
+            activityDao.getAllTrainingDataForActivity(activityId!!)
+        }
+
     }
 
     override fun onResume() {

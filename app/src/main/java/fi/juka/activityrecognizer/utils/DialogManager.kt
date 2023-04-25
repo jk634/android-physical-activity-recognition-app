@@ -16,7 +16,7 @@ class DialogManager(private val context: Context) {
 
 
     // Open the first dialog when the activity starts
-    fun showDialog(title: String, message: String, onPositiveButtonClick: () -> Unit) {
+    fun showActivityDialog(title: String, message: String, onPositiveButtonClick: () -> Unit) {
         builder.setTitle(title).setMessage(message)
         builder.setPositiveButton("Yes") { dialog, which ->
             onPositiveButtonClick()
@@ -81,6 +81,21 @@ class DialogManager(private val context: Context) {
             }
             dialog.dismiss()
         }
+
+    }
+
+    fun showSaveDialog(title: String, onPositiveButtonClick: () -> Unit) {
+        builder.setTitle(title)
+        builder.setPositiveButton("Yes") { dialog, which ->
+            onPositiveButtonClick()
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("No") { dialog, which ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
 
     }
 }

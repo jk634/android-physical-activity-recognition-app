@@ -101,26 +101,29 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
         db.close()
 
         for (x in trainingDataList) {
-            Log.d("TRAIN", "${x.id.toString()} ${x.x_axis.toString()} ${x.y_axis.toString()} ${x.z_axis.toString()} ${x.timestamp.toString()} ${x.activityId.toString()}")
+            Log.d("TRAINX", "${x.id.toString()} ${x.x_axis.toString()} ${x.y_axis.toString()} ${x.z_axis.toString()} ${x.timestamp.toString()} ${x.activityId.toString()}")
         }
 
         return trainingDataList
     }
 
-    fun saveData(acceleration: FloatArray, activityId: Long) {
+    fun saveData(accelerations: MutableList<FloatArray>, activityId: Long) {
 
+        lateinit var values: ContentValues
         val db = dbHelper.writableDatabase
 
-        val values = ContentValues().apply {
-            put(trainingDataEntry.COLUMN_NAME_TIMESTAMP, System.currentTimeMillis())
-            put(trainingDataEntry.COLUMN_NAME_X_AXIS,acceleration[0])
-            put(trainingDataEntry.COLUMN_NAME_Y_AXIS,acceleration[1])
-            put(trainingDataEntry.COLUMN_NAME_Z_AXIS, acceleration[2])
-            put(trainingDataEntry.COLUMN_NAME_Z_AXIS, acceleration[2])
-            put(trainingDataEntry.COLUMN_NAME_ACTIVITY_ID, activityId)
+        for (acc in accelerations) {
+            values = ContentValues().apply {
+                put(trainingDataEntry.COLUMN_NAME_TIMESTAMP, System.currentTimeMillis())
+                put(trainingDataEntry.COLUMN_NAME_X_AXIS,acc[0])
+                put(trainingDataEntry.COLUMN_NAME_Y_AXIS,acc[1])
+                put(trainingDataEntry.COLUMN_NAME_Z_AXIS, acc[2])
+                put(trainingDataEntry.COLUMN_NAME_ACTIVITY_ID, activityId)
+            }
+            if (values.size() > 0) {
+                db.insert(trainingDataEntry.TABLE_NAME, null, values)
+            }
         }
-
-        db.insert(trainingDataEntry.TABLE_NAME, null, values)
         db.close()
     }
 }
