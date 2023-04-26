@@ -3,6 +3,7 @@ package fi.juka.activityrecognizer.database
 import android.content.ContentValues
 import android.provider.BaseColumns
 import android.util.Log
+import kotlin.math.sqrt
 
 class ActivityDao(private val dbHelper: TrainingDbHelper) {
 
@@ -92,8 +93,9 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
             val z_axis = cursor.getFloat(cursor.getColumnIndexOrThrow(trainingDataEntry.COLUMN_NAME_Z_AXIS))
             val timestamp = cursor.getLong(cursor.getColumnIndexOrThrow(trainingDataEntry.COLUMN_NAME_TIMESTAMP))
             val activityId = cursor.getLong(cursor.getColumnIndexOrThrow(trainingDataEntry.COLUMN_NAME_ACTIVITY_ID))
+            val total_acceleration = cursor.getFloat(cursor.getColumnIndexOrThrow(trainingDataEntry.COLUMN_NAME_TOTAL_ACCELERATION))
 
-            val trainingData = TrainingData(id, x_axis, y_axis, z_axis, timestamp, activityId)
+            val trainingData = TrainingData(id, x_axis, y_axis, z_axis, total_acceleration, timestamp, activityId)
             trainingDataList.add(trainingData)
         }
 
@@ -101,7 +103,7 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
         db.close()
 
         for (x in trainingDataList) {
-            Log.d("TRAINX", "${x.id.toString()} ${x.x_axis.toString()} ${x.y_axis.toString()} ${x.z_axis.toString()} ${x.timestamp.toString()} ${x.activityId.toString()}")
+            Log.d("TRAINX", "${x.id.toString()} ${x.x_axis.toString()} ${x.y_axis.toString()} ${x.z_axis.toString()} ${x.total_acceleration.toString()} ${x.timestamp.toString()} ${x.activityId.toString()}")
         }
 
         return trainingDataList
@@ -113,11 +115,18 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
         val db = dbHelper.writableDatabase
 
         for (acc in accelerations) {
+            val x = acc[0].toDouble()
+            val y = acc[1].toDouble()
+            val z = acc[2].toDouble()
+
+            val totalAcc = sqrt(x*x + y*y + z*z)
+
             values = ContentValues().apply {
                 put(trainingDataEntry.COLUMN_NAME_TIMESTAMP, System.currentTimeMillis())
                 put(trainingDataEntry.COLUMN_NAME_X_AXIS,acc[0])
                 put(trainingDataEntry.COLUMN_NAME_Y_AXIS,acc[1])
                 put(trainingDataEntry.COLUMN_NAME_Z_AXIS, acc[2])
+                put(trainingDataEntry.COLUMN_NAME_TOTAL_ACCELERATION, totalAcc)
                 put(trainingDataEntry.COLUMN_NAME_ACTIVITY_ID, activityId)
             }
             if (values.size() > 0) {

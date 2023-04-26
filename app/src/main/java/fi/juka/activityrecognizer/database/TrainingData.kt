@@ -4,6 +4,7 @@ class TrainingData(   val id: Long,
                       val x_axis: Float,
                       val y_axis: Float,
                       val z_axis: Float,
+                      val total_acceleration: Float,
                       val timestamp: Long,
                       val activityId: Long) {
 

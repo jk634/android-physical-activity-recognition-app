@@ -9,7 +9,8 @@ object TrainingContract {
         const val COLUMN_NAME_Y_AXIS = "y_axis"
         const val COLUMN_NAME_Z_AXIS = "z_axis"
         const val COLUMN_NAME_TIMESTAMP = "timestamp"
-        const val COLUMN_NAME_ACTIVITY_ID = "activity_id" //
+        const val COLUMN_NAME_ACTIVITY_ID = "activity_id"
+        const val COLUMN_NAME_TOTAL_ACCELERATION = "total_acceleration"
 
         const val SQL_CREATE_TABLE = "CREATE TABLE ${TrainingDataEntry.TABLE_NAME} (" +
                 "${BaseColumns._ID} INTEGER PRIMARY KEY, " +
@@ -17,6 +18,7 @@ object TrainingContract {
                 "${TrainingDataEntry.COLUMN_NAME_X_AXIS} REAL, " +
                 "${TrainingDataEntry.COLUMN_NAME_Y_AXIS} REAL, " +
                 "${TrainingDataEntry.COLUMN_NAME_Z_AXIS} REAL, " +
+                "${TrainingDataEntry.COLUMN_NAME_TOTAL_ACCELERATION} REAL, " +
                 "${TrainingDataEntry.COLUMN_NAME_ACTIVITY_ID} REAL, " +
                 "FOREIGN KEY(${TrainingDataEntry.COLUMN_NAME_ACTIVITY_ID}) REFERENCES " +
                 "${ActivityEntry.TABLE_NAME}(${BaseColumns._ID}))"
