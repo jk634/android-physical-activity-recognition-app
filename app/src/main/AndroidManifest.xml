@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ActivityRecognizer">
         <activity
+            android:name=".activities.RecognizeActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.TrainActivity"
             android:exported="false" />
         <activity

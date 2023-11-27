@@ -29,7 +29,7 @@ object TrainingContract {
     object ActivityEntry {
         const val TABLE_NAME = "activity"
         const val COLUMN_NAME_ACTIVITY = "activity_name"
-       const val COLUMN_NAME_SAMPLES = "samples"
+        const val COLUMN_NAME_SAMPLES = "samples"
 
         const val SQL_CREATE_TABLE = "CREATE TABLE ${ActivityEntry.TABLE_NAME} (" +
                 "${BaseColumns._ID} INTEGER PRIMARY KEY, " +

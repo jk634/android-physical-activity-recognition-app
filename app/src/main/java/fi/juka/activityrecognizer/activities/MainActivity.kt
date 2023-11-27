@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity(), AccelerometerListener {
     private lateinit var acceleration: FloatArray
     private lateinit var btnTrain: Button
     private lateinit var btnChart: Button
+    private lateinit var btnRecognize: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,9 +26,11 @@ class MainActivity : AppCompatActivity(), AccelerometerListener {
 
         this.btnTrain = findViewById(R.id.btnTrain)
         this.btnChart = findViewById(R.id.btnChart)
+        this.btnRecognize = findViewById(R.id.btnRecognize)
 
         btnTrain.setOnClickListener{trainClicked()}
         btnChart.setOnClickListener{chartClicked()}
+        btnRecognize.setOnClickListener{recognizeClicked()}
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
@@ -51,6 +54,11 @@ class MainActivity : AppCompatActivity(), AccelerometerListener {
 
     private fun chartClicked() {
         val intent = Intent(this, ChartActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun recognizeClicked() {
+        val intent = Intent(this, RecognizeActivity::class.java)
         startActivity(intent)
     }
 }
