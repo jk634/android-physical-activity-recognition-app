@@ -19,6 +19,7 @@
         android:id="@+id/btnStartSample"
         android:layout_width="111dp"
         android:layout_height="111dp"
+        android:visibility="invisible"
         android:text="Start taking data" />
 
     <TextView
@@ -32,5 +33,12 @@
         android:layout_height="wrap_content"
         android:textSize="20dp"
         android:id="@+id/showSamplesCount"/>
+
+    <Button
+        android:id="@+id/retakeBtn"
+        android:layout_width="111dp"
+        android:layout_height="111dp"
+        android:visibility="invisible"
+        android:text="Retake?" />
 
 </LinearLayout>

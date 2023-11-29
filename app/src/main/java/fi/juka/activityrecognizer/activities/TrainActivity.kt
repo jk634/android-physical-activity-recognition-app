@@ -30,6 +30,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
     private lateinit var showTimer: TextView
     private lateinit var showSamplesCount: TextView
     private lateinit var startBtn: Button
+    private lateinit var retakeBtn: Button
     private val activityDao = ActivityDao(dbHelper)
     private val accelerationData = mutableListOf<FloatArray>()
 
@@ -43,6 +44,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
 
         this.accelerometer = Accelerometer(this)
         this.startBtn = findViewById(R.id.btnStartSample)
+        this.retakeBtn = findViewById(R.id.retakeBtn)
         this.showTimer = findViewById(R.id.showTimer)
         this.showSamplesCount = findViewById(R.id.showSamplesCount)
 
@@ -50,6 +52,10 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
 
         activityChoiseDialogHandler()
         startBtn.setOnClickListener{startClicked()}
+        retakeBtn.setOnClickListener{
+            retakeBtn.visibility = View.INVISIBLE
+            showSamplesCount.visibility = View.INVISIBLE
+            startClicked()}
         val n = activityDao.getActivitiesList()
 
         Log.d("TESTIÄ", n.toString())
@@ -102,6 +108,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
                         if (activityName != null && activityName.isNotEmpty()) {
                             activityId = activityDao.saveActivityAndGetId(activityName)
                             showTempActivity.text = "$activityName"
+                            startBtn.visibility = View.VISIBLE
                         }
                     },
                     { activityId, activityName ->
@@ -109,15 +116,22 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
                             this.activityName = activityName
                             this.activityId = activityId
                             showTempActivity.text = "${activityName}"
+                            startBtn.visibility = View.VISIBLE
                         } else {
                             this.activityName = null
                             this.activityId = null
                         }
+                    }, {
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
                     }
                 )
             },
             {
-               // TODO negative button -> takaisin mainiin
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
             }
         )
     }
@@ -130,6 +144,8 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
             activityDao.incrementSampleCount(activityId!!)
             activityDao.getAllTrainingDataForActivity(activityId!!)
             showSamplesCount.text = "Total samples ${activityDao.getSampleCount(activityId!!)}/10"
+            showSamplesCount.visibility = View.VISIBLE
+            retakeBtn.visibility = View.VISIBLE
         }
 
     }

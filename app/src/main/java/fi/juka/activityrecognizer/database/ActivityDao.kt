@@ -66,12 +66,8 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
         while (cursor.moveToNext()) {
             val activityId = cursor.getLong(cursor.getColumnIndexOrThrow("_id"))
             val activityName = cursor.getString(cursor.getColumnIndexOrThrow("activity_name"))
-            val activitySamples = cursor.getInt(cursor.getColumnIndexOrThrow("samples"))
+            // val activitySamples = cursor.getInt(cursor.getColumnIndexOrThrow("samples"))
             activitiesList.add(Pair(activityId, activityName))
-
-            // TODO Put samples forward
-
-            Log.d("SAMP", activitySamples.toString())
         }
 
         cursor.close()

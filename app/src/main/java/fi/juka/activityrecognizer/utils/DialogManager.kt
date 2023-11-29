@@ -41,7 +41,7 @@ class DialogManager(private val context: Context) {
 
     // Open a new dialog for the user to input the name of the activity.
     fun showNameDialog(title: String, onPositiveButtonClick: (String?) -> Unit,
-                       onSelectedActivityClick: (Long, String) -> Unit) {
+                       onSelectedActivityClick: (Long, String) -> Unit, onNegativeButtonClick: () -> Unit) {
 
         builder.setNegativeButton(null, null)
         builder.setTitle(title).setMessage("")
@@ -55,7 +55,7 @@ class DialogManager(private val context: Context) {
             val name = activity.second
             val sampleCount = activityDao.getSampleCount(id)
 
-            updatedActivities.add(Triple(id, name, "samples = ${sampleCount}/10"))
+            updatedActivities.add(Triple(id, name, "samples: ${sampleCount}/10"))
         }
 
         // Create the ListView and ArrayAdapter for the activities list
@@ -71,6 +71,11 @@ class DialogManager(private val context: Context) {
         layout.addView(listView)
         layout.addView(editText)
         builder.setView(layout)
+
+        builder.setNegativeButton("Cancel") { dialog, which ->
+            onNegativeButtonClick()
+            dialog.dismiss()
+        }
 
         builder.setPositiveButton("OK") { dialog, which ->
             val inputText = editText.text.toString()
