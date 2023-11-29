@@ -100,13 +100,14 @@ class DialogManager(private val context: Context) {
 
     }
 
-    fun showSaveDialog(title: String, onPositiveButtonClick: () -> Unit) {
+    fun showSaveDialog(title: String, onPositiveButtonClick: () -> Unit, onNegativeButtonClick: () -> Unit) {
         builder.setTitle(title)
         builder.setPositiveButton("Yes") { dialog, which ->
             onPositiveButtonClick()
             dialog.dismiss()
         }
         builder.setNegativeButton("No") { dialog, which ->
+            onNegativeButtonClick()
             dialog.dismiss()
         }
 
