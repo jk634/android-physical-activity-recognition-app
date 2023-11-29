@@ -2,6 +2,7 @@ package fi.juka.activityrecognizer.utils
 
 import android.app.AlertDialog
 import android.content.Context
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -12,20 +13,20 @@ import fi.juka.activityrecognizer.database.TrainingDbHelper
 class DialogManager(private val context: Context) {
 
     private val builder = AlertDialog.Builder(context)
-    val activityDao = ActivityDao(TrainingDbHelper(context))
+    private val activityDao = ActivityDao(TrainingDbHelper(context))
 
 
     // Open the first dialog when the activity starts
-    fun showActivityDialog(title: String, message: String, onPositiveButtonClick: () -> Unit) {
+    fun showActivityDialog(title: String, message: String, onPositiveButtonClick: () -> Unit, onNegativeButtonClick: () -> Unit) {
+
+        //startActivity(intent)
         builder.setTitle(title).setMessage(message)
         builder.setPositiveButton("Yes") { dialog, which ->
             onPositiveButtonClick()
             dialog.dismiss()
         }
         builder.setNegativeButton("No") { dialog, which ->
-            dialog.dismiss()
-        }
-        builder.setNeutralButton("Cancel") { dialog, which ->
+            onNegativeButtonClick()
             dialog.dismiss()
         }
 
@@ -45,11 +46,21 @@ class DialogManager(private val context: Context) {
         builder.setNegativeButton(null, null)
         builder.setTitle(title).setMessage("")
 
-        val activities = activityDao.getActivitiesList()
+        var activities = activityDao.getActivitiesList()
+        val updatedActivities = mutableListOf<Triple<Long, String, String>>()
+
+        // Add the number of samples to the list view
+        for (activity in activities) {
+            val id = activity.first
+            val name = activity.second
+            val sampleCount = activityDao.getSampleCount(id)
+
+            updatedActivities.add(Triple(id, name, "samples = ${sampleCount}/10"))
+        }
 
         // Create the ListView and ArrayAdapter for the activities list
         val listView = ListView(context)
-        val adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, activities)
+        val adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, updatedActivities)
         listView.adapter = adapter
 
         val editText = EditText(context)
@@ -74,7 +85,7 @@ class DialogManager(private val context: Context) {
         // Send the selected activity to the onSelectedActivityClick callback function
         listView.setOnItemClickListener { parent, view, position, id ->
             val selectedActivity = parent.getItemAtPosition(position)
-            if (selectedActivity is Pair<*, *>) {
+            if (selectedActivity is Triple<*, *, *>) {
                 val activityId = selectedActivity.first as Long
                 val activityName = selectedActivity.second as String
                 onSelectedActivityClick(activityId, activityName)

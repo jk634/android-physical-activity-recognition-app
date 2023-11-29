@@ -80,6 +80,28 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
         return activitiesList
     }
 
+    fun getSampleCount(activityId: Long): Int {
+        val db = dbHelper.readableDatabase
+
+        val selectQuery = "SELECT ${activityEntry.COLUMN_NAME_SAMPLES} FROM " +
+                "${activityEntry.TABLE_NAME} WHERE ${BaseColumns._ID} = ?"
+        var selectionArgs = arrayOf(activityId.toString())
+
+        val cursor = db.rawQuery(selectQuery, selectionArgs)
+
+        val samples: Int = if (cursor.moveToFirst()) {
+            cursor.getInt(0)
+        } else {
+            0
+        }
+
+        cursor.close()
+        db.close()
+
+        return samples
+    }
+
+
     fun getAllTrainingDataForActivity(activityId: Long): MutableList<TrainingData> {
         val db = dbHelper.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM ${trainingDataEntry.TABLE_NAME} WHERE " +
@@ -103,7 +125,8 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
         db.close()
 
         for (x in trainingDataList) {
-            Log.d("TRAINX", "${x.id.toString()} ${x.x_axis.toString()} ${x.y_axis.toString()} ${x.z_axis.toString()} ${x.total_acceleration.toString()} ${x.timestamp.toString()} ${x.activityId.toString()}")
+            Log.d("TRAINX", "${x.id.toString()} ${x.x_axis.toString()} ${x.y_axis.toString()} " +
+                    "${x.z_axis.toString()} ${x.total_acceleration.toString()} ${x.timestamp.toString()} ${x.activityId.toString()}")
         }
 
         return trainingDataList
