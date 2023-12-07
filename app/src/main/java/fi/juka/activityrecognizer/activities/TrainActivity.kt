@@ -139,14 +139,17 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
     fun saveDataDialogHandler() {
         val dialog = DialogManager(this)
 
-        dialog.showSaveDialog("Do you want to save this sample?") {
+        dialog.showSaveDialog("Do you want to save this sample?", {
             activityDao.saveData(accelerationData, activityId!!)
             activityDao.incrementSampleCount(activityId!!)
             activityDao.getAllTrainingDataForActivity(activityId!!)
             showSamplesCount.text = "Total samples ${activityDao.getSampleCount(activityId!!)}/10"
             showSamplesCount.visibility = View.VISIBLE
             retakeBtn.visibility = View.VISIBLE
+        }, {
+            retakeBtn.visibility = View.VISIBLE
         }
+        )
 
     }
 
