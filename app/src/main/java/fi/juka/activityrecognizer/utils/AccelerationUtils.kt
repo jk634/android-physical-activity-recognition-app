@@ -21,5 +21,21 @@ class AccelerationUtils {
             return totalDistance / totalTime
         }
 
+        fun calculateAverageTotalAcceleration(x: List<Double>, y: List<Double>, z: List<Double>): Double {
+
+            var totalAcceleration = 0.0
+
+            for (i in 1 until x.size) {
+                val accX = x[i]
+                val accY = y[i]
+                val accZ = z[i]
+
+                val acceleration = Math.sqrt(accX * accX + accY * accY + accZ * accZ)
+                totalAcceleration += acceleration
+            }
+
+            return totalAcceleration / x.size
+        }
+
     }
 }

@@ -7,12 +7,14 @@ import android.widget.TextView
 import fi.juka.activityrecognizer.R
 import fi.juka.activityrecognizer.accelerometer.AccelerationDataBuffer
 import fi.juka.activityrecognizer.accelerometer.Accelerometer
+import fi.juka.activityrecognizer.comparison.DataComparer
 import fi.juka.activityrecognizer.interfaces.AccelerometerListener
 import fi.juka.activityrecognizer.utils.AccelerationUtils
 
 class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
 
     private lateinit var accelerometer: Accelerometer
+    private lateinit var comparision: DataComparer
     private var recognizedActivity : TextView? = null
     private lateinit var accelerationBuffer: AccelerationDataBuffer
 
@@ -23,9 +25,12 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
         this.recognizedActivity = findViewById(R.id.recognizedActivity)
 
         this.accelerometer = Accelerometer(this)
+        this.comparision = DataComparer(this)
         accelerometer.register(this)
 
         this.accelerationBuffer = AccelerationDataBuffer(bufferSize = 20)
+
+        comparision.preprocessing()
 
     }
 
@@ -43,8 +48,11 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
             val z = currentData.map { it.first.third }
             val time = currentData.map { it.second }
 
-            val averageSpeed = AccelerationUtils.calculateAverageSpeed(x, y, z, time)
-            Log.d("average", "Average $averageSpeed")
+            //val averageSpeed = AccelerationUtils.calculateAverageSpeed(x, y, z, time)
+            //Log.d("average", "Average $averageSpeed")
+
+            val averageAcceleration = AccelerationUtils.calculateAverageTotalAcceleration(x,y,z)
+            Log.d("average", averageAcceleration.toString())
 
             accelerationBuffer.emptyData()
         }
