@@ -10,6 +10,7 @@ class DataComparer(private val context: Context) {
     private val activityDao = ActivityDao(TrainingDbHelper(context))
     private val activityAverageTotalAccList  = mutableListOf<Triple<Long, String, Double>>() // id and total acceleration average for every activity
     private var threshold = 0.0
+    private val stillThreshold = 0.1
 
     fun preprocessing() {
 
@@ -48,6 +49,12 @@ class DataComparer(private val context: Context) {
     fun compareDataAverages(realTimeTotAvrgAcc: Double, onActivityRecognized: (String) -> Unit) {
         Log.d("avrg", realTimeTotAvrgAcc.toString())
         Log.d("avrg", "DB + ${activityAverageTotalAccList}")
+
+        // if staying still
+        if (realTimeTotAvrgAcc < stillThreshold) {
+            onActivityRecognized("Still")
+            return
+        }
 
         val currentActivity = activityAverageTotalAccList.find { it.third - threshold <= realTimeTotAvrgAcc && realTimeTotAvrgAcc <= it.third + threshold }
 
