@@ -62,7 +62,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
-        accelerationData.add(acceleration)
+        accelerationData.add(accelerometer.filter(acceleration))
         showTempActivity.text = "${acceleration[0]} ${acceleration[1]} ${acceleration[2]}"
         //this.acceleration = acceleration
 

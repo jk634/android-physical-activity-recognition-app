@@ -15,18 +15,19 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
 
     private lateinit var accelerometer: Accelerometer
     private lateinit var comparision: DataComparer
-    private var recognizedActivity : TextView? = null
+    private var currentActivity : TextView? = null
     private lateinit var accelerationBuffer: AccelerationDataBuffer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recognize)
 
-        this.recognizedActivity = findViewById(R.id.recognizedActivity)
+        this.currentActivity = findViewById(R.id.currentActivity)
 
         this.accelerometer = Accelerometer(this)
         this.comparision = DataComparer(this)
         accelerometer.register(this)
+
 
         this.accelerationBuffer = AccelerationDataBuffer(bufferSize = 20)
 
@@ -35,8 +36,10 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
+        var accelerationData = accelerometer.filter(acceleration)
+
         accelerationBuffer.addData(
-            Triple(acceleration[0].toDouble(), acceleration[1].toDouble(), acceleration[2].toDouble()),
+            Triple(accelerationData[0].toDouble(), accelerationData[1].toDouble(), accelerationData[2].toDouble()),
             System.currentTimeMillis()
         )
 
@@ -51,13 +54,15 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
             //val averageSpeed = AccelerationUtils.calculateAverageSpeed(x, y, z, time)
             //Log.d("average", "Average $averageSpeed")
 
-            val averageAcceleration = AccelerationUtils.calculateAverageTotalAcceleration(x,y,z)
-            Log.d("average", averageAcceleration.toString())
+            val averageTotalAcceleration = AccelerationUtils.calculateAverageTotalAcceleration(x,y,z)
 
+            comparision.compareDataAverages(averageTotalAcceleration) { activityName ->
+                if (activityName != null && activityName.isNotEmpty()) {
+                    currentActivity!!.text = "$activityName"
+                }
+            }
             accelerationBuffer.emptyData()
         }
-
-        Log.d("current", currentData.toString())
     }
 
     override fun onResume() {

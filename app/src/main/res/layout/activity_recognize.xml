@@ -7,7 +7,7 @@
     tools:context=".activities.RecognizeActivity">
 
     <TextView
-        android:id="@+id/recognizedActivity"
+        android:id="@+id/currentActivity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />

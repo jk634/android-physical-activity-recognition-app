@@ -27,7 +27,7 @@ class TrainingDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NA
     }
 
     companion object {
-        const val DATABASE_VERSION = 1
+        const val DATABASE_VERSION = 2
         const val DATABASE_NAME = "Training.db"
     }
 }
