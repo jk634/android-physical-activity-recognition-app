@@ -154,4 +154,20 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
         }
         db.close()
     }
+
+    fun deleteActivity(activityId: Long) {
+        val db = dbHelper.writableDatabase
+        val selection = "${BaseColumns._ID} = ?"
+        val selectionArgs = arrayOf(activityId.toString())
+        db.delete(TrainingContract.ActivityEntry.TABLE_NAME, selection, selectionArgs)
+        db.close()
+    }
+
+    fun deleteSamplesForActivity(activityId: Long) {
+        val db = dbHelper.writableDatabase
+        val selection = "${TrainingContract.TrainingDataEntry.COLUMN_NAME_ACTIVITY_ID} = ?"
+        val selectionArgs = arrayOf(activityId.toString())
+        db.delete(TrainingContract.TrainingDataEntry.TABLE_NAME, selection, selectionArgs)
+        db.close()
+    }
 }

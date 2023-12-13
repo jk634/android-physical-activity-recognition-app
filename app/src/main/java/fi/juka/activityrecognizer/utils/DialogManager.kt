@@ -14,7 +14,8 @@ class DialogManager(private val context: Context) {
 
     private val builder = AlertDialog.Builder(context)
     private val activityDao = ActivityDao(TrainingDbHelper(context))
-
+    private val updatedActivities = mutableListOf<Triple<Long, String, String>>()
+    private lateinit var adapter: ArrayAdapter<Triple<Long, String, String>>
 
     // Open the first dialog when the activity starts
     fun showActivityDialog(title: String, message: String, onPositiveButtonClick: () -> Unit, onNegativeButtonClick: () -> Unit) {
@@ -46,8 +47,7 @@ class DialogManager(private val context: Context) {
         builder.setNegativeButton(null, null)
         builder.setTitle(title).setMessage("")
 
-        var activities = activityDao.getActivitiesList()
-        val updatedActivities = mutableListOf<Triple<Long, String, String>>()
+        val activities = activityDao.getActivitiesList()
 
         // Add the number of samples to the list view
         for (activity in activities) {
@@ -60,7 +60,7 @@ class DialogManager(private val context: Context) {
 
         // Create the ListView and ArrayAdapter for the activities list
         val listView = ListView(context)
-        val adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, updatedActivities)
+        adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, updatedActivities)
         listView.adapter = adapter
 
         val editText = EditText(context)
@@ -98,6 +98,33 @@ class DialogManager(private val context: Context) {
             dialog.dismiss()
         }
 
+        // Shows delete confirmation dialog when pressing long
+        listView.setOnItemLongClickListener { _, _, position, _ ->
+            val selectedActivity = updatedActivities[position]
+            val activityId = selectedActivity.first
+            showDeleteConfirmationDialog(activityId, position)
+            true
+        }
+    }
+
+    private fun showDeleteConfirmationDialog(activityId: Long, position: Int) {
+        val deleteDialogBuilder = AlertDialog.Builder(context)
+        deleteDialogBuilder.setTitle("Delete Activity")
+        deleteDialogBuilder.setMessage("Are you sure you want to delete this activity and its samples?")
+
+        deleteDialogBuilder.setPositiveButton("Yes") { _, _ ->
+            activityDao.deleteActivity(activityId)
+            activityDao.deleteSamplesForActivity(activityId)
+            updatedActivities.removeAt(position)
+            adapter.notifyDataSetChanged()
+        }
+
+        deleteDialogBuilder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = deleteDialogBuilder.create()
+        dialog.show()
     }
 
     fun showSaveDialog(title: String, onPositiveButtonClick: () -> Unit, onNegativeButtonClick: () -> Unit) {
@@ -113,6 +140,5 @@ class DialogManager(private val context: Context) {
 
         val dialog = builder.create()
         dialog.show()
-
     }
 }
