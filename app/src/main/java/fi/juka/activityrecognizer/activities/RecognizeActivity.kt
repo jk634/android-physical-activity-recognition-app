@@ -31,7 +31,6 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
         this.accelerationBuffer = AccelerationDataBuffer(bufferSize = 20)
 
         comparision.preprocessing()
-
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
