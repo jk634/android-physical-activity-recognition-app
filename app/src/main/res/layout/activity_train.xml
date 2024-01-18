@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".activities.TrainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tempActivity"
+        android:textSize="40dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="top"/>
+
+    <Button
+        android:id="@+id/btnStartSample"
+        android:layout_width="111dp"
+        android:layout_height="111dp"
+        android:visibility="invisible"
+        android:text="Start taking data" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="200dp"
+        android:id="@+id/showTimer"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:id="@+id/showSamplesCount"/>
+
+    <Button
+        android:id="@+id/retakeBtn"
+        android:layout_width="111dp"
+        android:layout_height="111dp"
+        android:visibility="invisible"
+        android:text="Retake?" />
+
+</LinearLayout>
