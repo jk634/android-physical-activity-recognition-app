@@ -28,7 +28,6 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
         this.comparision = DataComparer(this)
         accelerometer.register(this)
 
-
         this.accelerationBuffer = AccelerationDataBuffer(bufferSize = 20)
 
         comparision.preprocessing()
@@ -50,9 +49,6 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
             val y = currentData.map { it.first.second }
             val z = currentData.map { it.first.third }
             val time = currentData.map { it.second }
-
-            //val averageSpeed = AccelerationUtils.calculateAverageSpeed(x, y, z, time)
-            //Log.d("average", "Average $averageSpeed")
 
             val averageTotalAcceleration = AccelerationUtils.calculateAverageTotalAcceleration(x,y,z)
 

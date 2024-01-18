@@ -34,8 +34,6 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
     private val activityDao = ActivityDao(dbHelper)
     private val accelerationData = mutableListOf<FloatArray>()
 
-    //private lateinit var acceleration: FloatArray
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_train)
@@ -57,22 +55,16 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
             showSamplesCount.visibility = View.INVISIBLE
             startClicked()}
         val n = activityDao.getActivitiesList()
-
-        Log.d("TESTIÄ", n.toString())
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
         accelerationData.add(accelerometer.filter(acceleration))
         showTempActivity.text = "${acceleration[0]} ${acceleration[1]} ${acceleration[2]}"
-        //this.acceleration = acceleration
-
-        //activityDao.saveData(acceleration, activityId!!)
-
     }
 
     fun startClicked() {
         startBtn.visibility = View.GONE
-        showTempActivity.textSize = 20f
+        showTempActivity.textSize = 17f
         Thread {
             var x = 0
             accelerometer.register(this)
@@ -87,8 +79,6 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
             runOnUiThread() {
                 showTimer.textSize = 50F
                 showTimer.text = "Completed"
-                //activityDao.incrementSampleCount(activityId!!)
-                //activityDao.getAllTrainingDataForActivity(activityId!!)
                 saveDataDialogHandler()
 
             }
@@ -100,7 +90,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
         val dialogManager = DialogManager(this)
         dialogManager.showActivityDialog(
             "Create Training Data",
-            "Would you like to start taking training data?",
+            "Would you like to start taking the training data?",
             {
                 dialogManager.showNameDialog(
                     "Choose an existing activity or create a new one to collect data",
@@ -150,7 +140,6 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
             retakeBtn.visibility = View.VISIBLE
         }
         )
-
     }
 
     override fun onBackPressed() {

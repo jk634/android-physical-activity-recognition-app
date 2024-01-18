@@ -7,15 +7,16 @@ import fi.juka.activityrecognizer.database.TrainingDbHelper
 import fi.juka.activityrecognizer.utils.AccelerationUtils
 
 class DataComparer(private val context: Context) {
+
     private val activityDao = ActivityDao(TrainingDbHelper(context))
-    private val activityAverageTotalAccList  = mutableListOf<Triple<Long, String, Double>>() // id and total acceleration average for every activity
+    // id name and total acceleration average for every activity
+    private val activityAverageTotalAccList  = mutableListOf<Triple<Long, String, Double>>()
     private var threshold = 0.0
     private val stillThreshold = 0.1
 
     fun preprocessing() {
 
         var activities = activityDao.getActivitiesList()
-        Log.d("ACTIVITIES", activities.toString())
 
         for (activity in activities) {
             val activityId = activity.first
@@ -38,17 +39,11 @@ class DataComparer(private val context: Context) {
                 val minAverage = activityAverageTotalAccList.minByOrNull { it.third }!!.third
 
                 threshold = (maxAverage - minAverage) / activityAverageTotalAccList.size
-
-                Log.d("preprocess", activityAverageTotalAccList.toString())
-                Log.d("preprocess", "threshold $threshold")
-            }
             }
         }
-
+    }
 
     fun compareDataAverages(realTimeTotAvrgAcc: Double, onActivityRecognized: (String) -> Unit) {
-        Log.d("avrg", realTimeTotAvrgAcc.toString())
-        Log.d("avrg", "DB + ${activityAverageTotalAccList}")
 
         // if staying still
         if (realTimeTotAvrgAcc < stillThreshold) {
@@ -56,7 +51,8 @@ class DataComparer(private val context: Context) {
             return
         }
 
-        val currentActivity = activityAverageTotalAccList.find { it.third - threshold <= realTimeTotAvrgAcc && realTimeTotAvrgAcc <= it.third + threshold }
+        val currentActivity = activityAverageTotalAccList.find { it.third - threshold <= realTimeTotAvrgAcc
+                && realTimeTotAvrgAcc <= it.third + threshold }
 
         currentActivity?.let {
             onActivityRecognized(it.second)

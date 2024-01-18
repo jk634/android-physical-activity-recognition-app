@@ -31,11 +31,6 @@ class DialogManager(private val context: Context) {
             dialog.dismiss()
         }
 
-        /*
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_view, null)
-        builder.setView(dialogView)
-         */
-
         val dialog = builder.create()
         dialog.show()
     }

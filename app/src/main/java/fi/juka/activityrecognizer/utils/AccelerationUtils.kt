@@ -36,6 +36,6 @@ class AccelerationUtils {
 
             return totalAcceleration / x.size
         }
-
     }
 }
+
