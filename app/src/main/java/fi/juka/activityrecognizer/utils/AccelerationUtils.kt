@@ -2,23 +2,44 @@ package fi.juka.activityrecognizer.utils
 
 class AccelerationUtils {
     companion object {
-        fun calculateAverageSpeed(x: List<Double>, y: List<Double>, z: List<Double>, time: List<Long>): Double {
+        fun calculateAverageSpeed(accelerationData: List<Pair<FloatArray, Long>>): Double {
 
-            var totalDistance = 0.0
+            var totalSpeed = 0.0
             var totalTime = 0.0
 
-            for (i in 1 until x.size) {
-                val timeDifference = (time[i] - time[i - 1]) / 1000.0 // time in seconds
-                val distanceX = Math.abs(x[i] - x[i - 1])
-                val distanceY = Math.abs(y[i] - y[i - 1])
-                val distanceZ = Math.abs(z[i] - z[i - 1])
+            // Iterate through the acceleration data.
+            for (i in 1 until accelerationData.size) {
+                // Calculate the time difference between the previous and current samples in seconds.
+                val timeDifferenceSeconds = (accelerationData[i].second - accelerationData[i - 1].second) / 1000.0
 
-                val distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ)
-                totalDistance += distance
-                totalTime += timeDifference
+                // Calculate the acceleration change for each axis.
+                val deltaX = accelerationData[i].first[0] - accelerationData[i - 1].first[0]
+                val deltaY = accelerationData[i].first[1] - accelerationData[i - 1].first[1]
+                val deltaZ = accelerationData[i].first[2] - accelerationData[i - 1].first[2]
+
+                // Calculate the speed for each axis using simple numerical integration.
+                val speedX = deltaX * timeDifferenceSeconds
+                val speedY = deltaY * timeDifferenceSeconds
+                val speedZ = deltaZ * timeDifferenceSeconds
+
+                // Calculate the total speed magnitude.
+                val totalSpeedDelta = Math.sqrt(speedX * speedX + speedY * speedY + speedZ * speedZ)
+
+                // Add the speed magnitude to the total speed.
+                totalSpeed += totalSpeedDelta
+
+                // Add the time difference to the total time.
+                totalTime += timeDifferenceSeconds
             }
 
-            return totalDistance / totalTime
+            // Calculate the average speed by dividing the total speed by the total time.
+            val averageSpeed = if (totalTime != 0.0) {
+                totalSpeed / totalTime
+            } else {
+                0.0  // Avoid division by zero.
+            }
+
+            return averageSpeed
         }
 
         fun calculateAverageTotalAcceleration(x: List<Double>, y: List<Double>, z: List<Double>): Double {

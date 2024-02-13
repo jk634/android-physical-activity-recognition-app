@@ -121,30 +121,70 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
         db.close()
 
         for (x in trainingDataList) {
-            Log.d("TRAINX", "${x.id.toString()} ${x.x_axis.toString()} ${x.y_axis.toString()} " +
-                    "${x.z_axis.toString()} ${x.total_acceleration.toString()} ${x.timestamp.toString()} ${x.activityId.toString()}")
+            Log.d("TRAINX", "${x.id} ${x.x_axis} ${x.y_axis} " +
+                    "${x.z_axis} ${x.total_acceleration} ${x.timestamp} ${x.activityId}")
         }
 
         return trainingDataList
     }
 
-    fun saveData(accelerations: MutableList<FloatArray>, activityId: Long) {
+
+    fun updateAverageSpeed(newSpeed: Double, activityId: Long) {
+
+        Log.d("TEST", newSpeed.toString())
+
+        val db = dbHelper.writableDatabase
+
+        val selectQuery = "SELECT ${activityEntry.COLUMN_NAME_AVERAGE_SPEED} FROM " +
+                "${activityEntry.TABLE_NAME} WHERE ${BaseColumns._ID} = ?"
+        val selectionArgs = arrayOf(activityId.toString())
+
+        val cursor = db.rawQuery(selectQuery, selectionArgs)
+        cursor.moveToFirst()
+        val oldAverageSpeed = cursor.getLong(cursor.getColumnIndexOrThrow(activityEntry.COLUMN_NAME_AVERAGE_SPEED))
+
+        val updatedSpeed = if (oldAverageSpeed != 0L) {
+            (oldAverageSpeed + newSpeed) / 2
+        } else {
+            newSpeed
+        }
+
+        Log.d("Test", updatedSpeed.toString())
+
+        val values = ContentValues().apply {
+            put(activityEntry.COLUMN_NAME_AVERAGE_SPEED, updatedSpeed)
+        }
+
+        val selection = "${BaseColumns._ID} = ?"
+        val selectionArgsUpdate = arrayOf(activityId.toString())
+
+        db.update(
+            activityEntry.TABLE_NAME,
+            values,
+            selection,
+            selectionArgsUpdate
+        )
+
+        db.close()
+    }
+
+    fun saveData(accelerations: MutableList<Pair<FloatArray, Long>>, activityId: Long) {
 
         lateinit var values: ContentValues
         val db = dbHelper.writableDatabase
 
         for (acc in accelerations) {
-            val x = acc[0].toDouble()
-            val y = acc[1].toDouble()
-            val z = acc[2].toDouble()
+            val x = acc.first[0].toDouble()
+            val y = acc.first[1].toDouble()
+            val z = acc.first[2].toDouble()
 
             val totalAcc = sqrt(x*x + y*y + z*z)
 
             values = ContentValues().apply {
-                put(trainingDataEntry.COLUMN_NAME_TIMESTAMP, System.currentTimeMillis())
-                put(trainingDataEntry.COLUMN_NAME_X_AXIS,acc[0])
-                put(trainingDataEntry.COLUMN_NAME_Y_AXIS,acc[1])
-                put(trainingDataEntry.COLUMN_NAME_Z_AXIS, acc[2])
+                put(trainingDataEntry.COLUMN_NAME_TIMESTAMP, acc.second)
+                put(trainingDataEntry.COLUMN_NAME_X_AXIS,acc.first[0])
+                put(trainingDataEntry.COLUMN_NAME_Y_AXIS,acc.first[1])
+                put(trainingDataEntry.COLUMN_NAME_Z_AXIS, acc.first[2])
                 put(trainingDataEntry.COLUMN_NAME_TOTAL_ACCELERATION, totalAcc)
                 put(trainingDataEntry.COLUMN_NAME_ACTIVITY_ID, activityId)
             }

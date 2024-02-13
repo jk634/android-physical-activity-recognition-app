@@ -2,19 +2,18 @@ package fi.juka.activityrecognizer.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import fi.juka.activityrecognizer.R
 import fi.juka.activityrecognizer.accelerometer.AccelerationDataBuffer
 import fi.juka.activityrecognizer.accelerometer.Accelerometer
-import fi.juka.activityrecognizer.comparison.DataComparer
+import fi.juka.activityrecognizer.comparison.DataCompare
 import fi.juka.activityrecognizer.interfaces.AccelerometerListener
 import fi.juka.activityrecognizer.utils.AccelerationUtils
 
 class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
 
     private lateinit var accelerometer: Accelerometer
-    private lateinit var comparision: DataComparer
+    private lateinit var comparision: DataCompare
     private var currentActivity : TextView? = null
     private lateinit var accelerationBuffer: AccelerationDataBuffer
 
@@ -25,7 +24,7 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
         this.currentActivity = findViewById(R.id.currentActivity)
 
         this.accelerometer = Accelerometer(this)
-        this.comparision = DataComparer(this)
+        this.comparision = DataCompare(this)
         accelerometer.register(this)
 
         this.accelerationBuffer = AccelerationDataBuffer(bufferSize = 20)
@@ -34,10 +33,10 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
-        var accelerationData = accelerometer.filter(acceleration)
+        val accData = accelerometer.filter(acceleration)
 
         accelerationBuffer.addData(
-            Triple(accelerationData[0].toDouble(), accelerationData[1].toDouble(), accelerationData[2].toDouble()),
+            Triple(accData[0].toDouble(), accData[1].toDouble(), accData[2].toDouble()),
             System.currentTimeMillis()
         )
 
@@ -47,14 +46,10 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
             val x = currentData.map { it.first.first }
             val y = currentData.map { it.first.second }
             val z = currentData.map { it.first.third }
-            val time = currentData.map { it.second }
 
             val averageTotalAcceleration = AccelerationUtils.calculateAverageTotalAcceleration(x,y,z)
-
-            comparision.compareDataAverages(averageTotalAcceleration) { activityName ->
-                if (activityName != null && activityName.isNotEmpty()) {
-                    currentActivity!!.text = "$activityName"
-                }
+            comparision.compareTotalAccelerationAverages(averageTotalAcceleration) { activityName ->
+                currentActivity!!.text = activityName
             }
             accelerationBuffer.emptyData()
         }

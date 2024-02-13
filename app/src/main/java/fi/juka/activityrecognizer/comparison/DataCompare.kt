@@ -6,17 +6,17 @@ import fi.juka.activityrecognizer.database.ActivityDao
 import fi.juka.activityrecognizer.database.TrainingDbHelper
 import fi.juka.activityrecognizer.utils.AccelerationUtils
 
-class DataComparer(private val context: Context) {
+class DataCompare(private val context: Context) {
 
     private val activityDao = ActivityDao(TrainingDbHelper(context))
     // id name and total acceleration average for every activity
     private val activityAverageTotalAccList  = mutableListOf<Triple<Long, String, Double>>()
     private var threshold = 0.0
-    private val stillThreshold = 0.1
+    private val stillThreshold = 0.2
 
     fun preprocessing() {
 
-        var activities = activityDao.getActivitiesList()
+        val activities = activityDao.getActivitiesList()
 
         for (activity in activities) {
             val activityId = activity.first
@@ -26,7 +26,7 @@ class DataComparer(private val context: Context) {
 
             if (samples.isNotEmpty()) {
 
-                var averageTotalAcc = AccelerationUtils.calculateAverageTotalAcceleration(
+                val averageTotalAcc = AccelerationUtils.calculateAverageTotalAcceleration(
                     samples.map { it.x_axis.toDouble() },
                     samples.map { it.y_axis.toDouble() },
                     samples.map { it.z_axis.toDouble() })
@@ -43,19 +43,27 @@ class DataComparer(private val context: Context) {
         }
     }
 
-    fun compareDataAverages(realTimeTotAvrgAcc: Double, onActivityRecognized: (String) -> Unit) {
+    fun compareTotalAccelerationAverages(realTimeTotAvrgAcc: Double, onActivityRecognized: (String) -> Unit) {
 
         // if staying still
         if (realTimeTotAvrgAcc < stillThreshold) {
-            onActivityRecognized("Still")
+            onActivityRecognized("still")
             return
         }
 
-        val currentActivity = activityAverageTotalAccList.find { it.third - threshold <= realTimeTotAvrgAcc
-                && realTimeTotAvrgAcc <= it.third + threshold }
+        val candidates = activityAverageTotalAccList.filter {
+            it.third - threshold <= realTimeTotAvrgAcc && realTimeTotAvrgAcc <= it.third + threshold
+        }
 
-        currentActivity?.let {
-            onActivityRecognized(it.second)
+        when {
+            candidates.size == 1 -> onActivityRecognized(candidates.first().second)
+            candidates.size > 1 -> {
+                val closestActivity = candidates.minByOrNull { Math.abs(it.third - realTimeTotAvrgAcc) }
+                closestActivity?.let {
+                    onActivityRecognized(it.second)
+                }
+            }
+            else -> onActivityRecognized("")
         }
     }
 }

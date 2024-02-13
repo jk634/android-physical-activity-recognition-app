@@ -16,6 +16,7 @@ import fi.juka.activityrecognizer.database.ActivityDao
 import fi.juka.activityrecognizer.database.TrainingContract
 import fi.juka.activityrecognizer.database.TrainingDbHelper
 import fi.juka.activityrecognizer.interfaces.AccelerometerListener
+import fi.juka.activityrecognizer.utils.AccelerationUtils
 import fi.juka.activityrecognizer.utils.DialogManager
 import org.w3c.dom.Text
 
@@ -32,7 +33,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
     private lateinit var startBtn: Button
     private lateinit var retakeBtn: Button
     private val activityDao = ActivityDao(dbHelper)
-    private val accelerationData = mutableListOf<FloatArray>()
+    private val accelerationData = mutableListOf<Pair<FloatArray, Long>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,8 +59,10 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
-        accelerationData.add(accelerometer.filter(acceleration))
-        showTempActivity.text = "${acceleration[0]} ${acceleration[1]} ${acceleration[2]}"
+        val filteredAccData = accelerometer.filter(acceleration)
+        val data = Pair(filteredAccData, System.currentTimeMillis())
+        accelerationData.add(data)
+        showTempActivity.text = "${filteredAccData[0]} ${filteredAccData[1]} ${filteredAccData[2]}"
     }
 
     fun startClicked() {
@@ -133,6 +136,10 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
             activityDao.saveData(accelerationData, activityId!!)
             activityDao.incrementSampleCount(activityId!!)
             activityDao.getAllTrainingDataForActivity(activityId!!)
+
+            val sampleAverageSpeed = AccelerationUtils.calculateAverageSpeed(accelerationData)
+            activityDao.updateAverageSpeed(sampleAverageSpeed, activityId!!)
+
             showSamplesCount.text = "Total samples ${activityDao.getSampleCount(activityId!!)}/10"
             showSamplesCount.visibility = View.VISIBLE
             retakeBtn.visibility = View.VISIBLE
