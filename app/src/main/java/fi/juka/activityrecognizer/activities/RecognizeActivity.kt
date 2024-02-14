@@ -2,6 +2,7 @@ package fi.juka.activityrecognizer.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import fi.juka.activityrecognizer.R
 import fi.juka.activityrecognizer.accelerometer.AccelerationDataBuffer
@@ -13,9 +14,9 @@ import fi.juka.activityrecognizer.utils.AccelerationUtils
 class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
 
     private lateinit var accelerometer: Accelerometer
-    private lateinit var comparision: DataCompare
+    private lateinit var comparison: DataCompare
     private var currentActivity : TextView? = null
-    private lateinit var accelerationBuffer: AccelerationDataBuffer
+    private val currentData = mutableListOf<FloatArray>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,34 +25,32 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
         this.currentActivity = findViewById(R.id.currentActivity)
 
         this.accelerometer = Accelerometer(this)
-        this.comparision = DataCompare(this)
+        this.comparison = DataCompare(this)
         accelerometer.register(this)
 
-        this.accelerationBuffer = AccelerationDataBuffer(bufferSize = 20)
-
-        comparision.preprocessing()
+        comparison.preprocessing()
     }
 
     override fun onAccelerationChanged(acceleration: FloatArray) {
+
         val accData = accelerometer.filter(acceleration)
 
-        accelerationBuffer.addData(
-            Triple(accData[0].toDouble(), accData[1].toDouble(), accData[2].toDouble()),
-            System.currentTimeMillis()
+        currentData.add(
+                floatArrayOf(accData[0], accData[1], accData[2])
         )
 
-        val currentData = accelerationBuffer.getData()
+        if (currentData.size == 40) {
+            val x = currentData.map { it[0].toDouble() }
+            val y = currentData.map { it[1].toDouble() }
+            val z = currentData.map { it[2].toDouble() }
 
-        if (currentData.size == 20) {
-            val x = currentData.map { it.first.first }
-            val y = currentData.map { it.first.second }
-            val z = currentData.map { it.first.third }
+            val avrgTotalAcc = AccelerationUtils.calculateAverageTotalAcceleration(x,y,z)
 
-            val averageTotalAcceleration = AccelerationUtils.calculateAverageTotalAcceleration(x,y,z)
-            comparision.compareTotalAccelerationAverages(averageTotalAcceleration) { activityName ->
-                currentActivity!!.text = activityName
+            comparison.compareTotalAccelerationAverages(avrgTotalAcc) { activityName ->
+                val formattedSpeed = "%.3f".format(avrgTotalAcc)
+                currentActivity!!.text = "$activityName\n\ntotal acceleration\n$formattedSpeed"
             }
-            accelerationBuffer.emptyData()
+            currentData.clear()
         }
     }
 

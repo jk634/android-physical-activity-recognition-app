@@ -33,11 +33,7 @@ class AccelerationUtils {
             }
 
             // Calculate the average speed by dividing the total speed by the total time.
-            val averageSpeed = if (totalTime != 0.0) {
-                totalSpeed / totalTime
-            } else {
-                0.0  // Avoid division by zero.
-            }
+            val averageSpeed = totalSpeed / totalTime
 
             return averageSpeed
         }

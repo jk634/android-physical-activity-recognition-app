@@ -54,9 +54,9 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
         db.close()
     }
 
-    fun getActivitiesList(): MutableList<Pair<Long, String>> {
+    fun getActivitiesList(): MutableList<Triple<Long, String, Double>> {
 
-        val activitiesList = mutableListOf<Pair<Long, String>>()
+        val activitiesList = mutableListOf<Triple<Long, String, Double>>()
 
         // Fetch all activities from the database
         val db = dbHelper.readableDatabase
@@ -66,8 +66,8 @@ class ActivityDao(private val dbHelper: TrainingDbHelper) {
         while (cursor.moveToNext()) {
             val activityId = cursor.getLong(cursor.getColumnIndexOrThrow("_id"))
             val activityName = cursor.getString(cursor.getColumnIndexOrThrow("activity_name"))
-            // val activitySamples = cursor.getInt(cursor.getColumnIndexOrThrow("samples"))
-            activitiesList.add(Pair(activityId, activityName))
+            val activityAverageSpeed = cursor.getDouble(cursor.getColumnIndexOrThrow("average_speed"))
+            activitiesList.add(Triple(activityId, activityName, activityAverageSpeed))
         }
 
         cursor.close()

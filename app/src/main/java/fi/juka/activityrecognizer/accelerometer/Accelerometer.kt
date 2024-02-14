@@ -45,7 +45,7 @@ class Accelerometer(context: Context) : SensorEventListener {
 
     // Filter accelerometer data with low- and high-pass filters
     fun filter(acceleration: FloatArray): FloatArray {
-        val alpha: Float = 0.8f
+        val alpha: Float = 0.95f
 
         // Low-pass, isolates the force of gravity
         gravity[0] = alpha * gravity[0] + (1 - alpha) * acceleration[0]

@@ -71,7 +71,7 @@ class TrainActivity : AppCompatActivity(), AccelerometerListener {
         Thread {
             var x = 0
             accelerometer.register(this)
-            while (x < 10) {
+            while (x < 5) {
                 runOnUiThread() {
                     showTimer.text = (x + 1).toString()
                 }
