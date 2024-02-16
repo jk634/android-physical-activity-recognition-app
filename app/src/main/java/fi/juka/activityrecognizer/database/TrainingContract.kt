@@ -14,11 +14,11 @@ object TrainingContract {
 
         const val SQL_CREATE_TABLE = "CREATE TABLE ${TrainingDataEntry.TABLE_NAME} (" +
                 "${BaseColumns._ID} INTEGER PRIMARY KEY, " +
-                "${TrainingDataEntry.COLUMN_NAME_TIMESTAMP} LONG, " +
+                "${TrainingDataEntry.COLUMN_NAME_TIMESTAMP} LONG DEFAULT 0, " +
                 "${TrainingDataEntry.COLUMN_NAME_X_AXIS} REAL, " +
                 "${TrainingDataEntry.COLUMN_NAME_Y_AXIS} REAL, " +
                 "${TrainingDataEntry.COLUMN_NAME_Z_AXIS} REAL, " +
-                "${TrainingDataEntry.COLUMN_NAME_TOTAL_ACCELERATION} REAL, " +
+                "${TrainingDataEntry.COLUMN_NAME_TOTAL_ACCELERATION} REAL DEFAULT 0, " +
                 "${TrainingDataEntry.COLUMN_NAME_ACTIVITY_ID} REAL, " +
                 "FOREIGN KEY(${TrainingDataEntry.COLUMN_NAME_ACTIVITY_ID}) REFERENCES " +
                 "${ActivityEntry.TABLE_NAME}(${BaseColumns._ID}))"
@@ -37,7 +37,6 @@ object TrainingContract {
                 "${ActivityEntry.COLUMN_NAME_ACTIVITY} TEXT, " +
                 "${ActivityEntry.COLUMN_NAME_SAMPLES} INTEGER DEFAULT 0, " +
                 "${ActivityEntry.COLUMN_NAME_AVERAGE_SPEED} DOUBLE DEFAULT 0)"
-
 
         const val SQL_DROP_TABLE = "DROP TABLE IF EXISTS ${ActivityEntry.TABLE_NAME}"
     }
