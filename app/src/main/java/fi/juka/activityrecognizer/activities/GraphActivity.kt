@@ -5,26 +5,26 @@ import android.os.Bundle
 import fi.juka.activityrecognizer.accelerometer.Accelerometer
 import fi.juka.activityrecognizer.interfaces.AccelerometerListener
 import fi.juka.activityrecognizer.R
-import fi.juka.activityrecognizer.graphs.AccelerometerChartView
+import fi.juka.activityrecognizer.graphs.AccelerometerGraphView
 
-class ChartActivity : AppCompatActivity(), AccelerometerListener {
+class GraphActivity : AppCompatActivity(), AccelerometerListener {
 
     private lateinit var accelerometer: Accelerometer
-    private lateinit var accelerationChartView: AccelerometerChartView
+    private lateinit var accelerationGraphView: AccelerometerGraphView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chart)
+        setContentView(R.layout.activity_graph)
 
         this.accelerometer = Accelerometer(this)
         accelerometer.register(this)
-        this.accelerationChartView = AccelerometerChartView(this)
+        this.accelerationGraphView = AccelerometerGraphView(this)
     }
 
-    // Filter data and refresh the accelerationChartView with new values
+    // Filter data and refresh the accelerationGraphView with new values
     override fun onAccelerationChanged(acceleration: FloatArray) {
         accelerometer.filter(acceleration)
-        accelerationChartView.update(acceleration[0], acceleration[1], acceleration[2])
+        accelerationGraphView.update(acceleration[0], acceleration[1], acceleration[2])
     }
 
     override fun onResume() {

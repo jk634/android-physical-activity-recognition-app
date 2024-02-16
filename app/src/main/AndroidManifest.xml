@@ -18,7 +18,7 @@
             android:name=".activities.TrainActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.ChartActivity"
+            android:name=".activities.GraphActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity(), AccelerometerListener {
     private lateinit var accelerometer: Accelerometer
     private lateinit var acceleration: FloatArray
     private lateinit var btnTrain: Button
-    private lateinit var btnChart: Button
+    private lateinit var btnGraph: Button
     private lateinit var btnRecognize: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,11 +25,11 @@ class MainActivity : AppCompatActivity(), AccelerometerListener {
         accelerometer.register(this)
 
         this.btnTrain = findViewById(R.id.btnTrain)
-        this.btnChart = findViewById(R.id.btnChart)
+        this.btnGraph = findViewById(R.id.btnGraph)
         this.btnRecognize = findViewById(R.id.btnRecognize)
 
         btnTrain.setOnClickListener{trainClicked()}
-        btnChart.setOnClickListener{chartClicked()}
+        btnGraph.setOnClickListener{graphClicked()}
         btnRecognize.setOnClickListener{recognizeClicked()}
     }
 
@@ -52,8 +52,8 @@ class MainActivity : AppCompatActivity(), AccelerometerListener {
         startActivity(intent)
     }
 
-    private fun chartClicked() {
-        val intent = Intent(this, ChartActivity::class.java)
+    private fun graphClicked() {
+        val intent = Intent(this, GraphActivity::class.java)
         startActivity(intent)
     }
 

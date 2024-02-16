@@ -9,7 +9,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import fi.juka.activityrecognizer.R
 
-class AccelerometerChartView(private val context: Context) {
+class AccelerometerGraphView(private val context: Context) {
 
     private val graphView = (context as Activity).findViewById<GraphView>(R.id.graph)
     private val viewport = graphView.viewport
@@ -45,7 +45,7 @@ class AccelerometerChartView(private val context: Context) {
         seriesY.title = "Y-Axis: 0.000000"
         seriesZ.title = "Z-Axis: 0.000000"
 
-        // Add the datapoint series to the chart
+        // Add the datapoint series to the graph
         graphView.addSeries(seriesX)
         graphView.addSeries(seriesY)
         graphView.addSeries(seriesZ)
@@ -64,7 +64,7 @@ class AccelerometerChartView(private val context: Context) {
         seriesZ.title = "Z-Axis: $z"
 
         // Sets the minimum X-value to be 100 before the maximum X-value to ensure that the
-        // chart shows the most recent data.
+        // graph shows the most recent data.
         val maxX = seriesX.highestValueX.coerceAtMost(seriesY.highestValueX)
             .coerceAtMost(seriesZ.highestValueX)
         val minX = maxX - 100.0
