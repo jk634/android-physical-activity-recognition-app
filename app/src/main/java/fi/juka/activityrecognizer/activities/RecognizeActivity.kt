@@ -44,11 +44,20 @@ class RecognizeActivity : AppCompatActivity(), AccelerometerListener {
             val y = currentData.map { it[1].toDouble() }
             val z = currentData.map { it[2].toDouble() }
 
-            val avrgTotalAcc = AccelerationUtils.calculateAverageTotalAcceleration(x,y,z)
+            val avrgTotalAccReal = AccelerationUtils.calculateAverageTotalAcceleration(x,y,z)
 
-            comparison.compareTotalAccelerationAverages(avrgTotalAcc) { activityName ->
-                val formattedSpeed = "%.3f".format(avrgTotalAcc)
-                currentActivity!!.text = "$activityName\n\ntotal acceleration\n$formattedSpeed"
+            comparison.compareDataAverages(avrgTotalAccReal) { activityName, activityTotAcc ->
+
+                val activityInfo = if (activityName != null && activityName != "still") {
+                    "You are $activityName\n(${String.format("%.3f", activityTotAcc)})\n"
+                } else if (activityName == "still") {
+                    "still\n"
+                } else {
+                    ""
+                }
+
+                val formattedReal = "%.3f".format(avrgTotalAccReal)
+                currentActivity!!.text = "$activityInfo\nReal time total acceleration\n$formattedReal"
             }
             currentData.clear()
         }

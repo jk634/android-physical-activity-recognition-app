@@ -56,35 +56,37 @@ class DataCompare(private val context: Context) {
         }
     }
 
-    fun compareTotalAccelerationAverages(realTimeTotAvrgAcc: Double, onActivityRecognized: (String) -> Unit) {
+    fun compareDataAverages(realTimeTotAvrgAcc: Double, onActivityRecognized: (String?, Double?) -> Unit) {
 
         // if staying still
         if (realTimeTotAvrgAcc < stillThreshold) {
-            onActivityRecognized("still")
+            onActivityRecognized("still", null)
             return
         }
 
         val candidates = activityAverageTotalAccList.filter {
-            it.third - thresholdAcceleration <= realTimeTotAvrgAcc && realTimeTotAvrgAcc <= it.third + thresholdAcceleration
+            it.third - thresholdAcceleration <= realTimeTotAvrgAcc && realTimeTotAvrgAcc <= it.third +
+                    thresholdAcceleration
         }
 
         when {
-            candidates.size == 1 -> onActivityRecognized(candidates.first().second)
+            candidates.size == 1 -> onActivityRecognized(candidates.first().second,
+                candidates.first().third)
             candidates.size > 1 -> {
                 val closestActivity = candidates.minByOrNull { Math.abs(it.third - realTimeTotAvrgAcc) }
                 closestActivity?.let {
-                    onActivityRecognized(it.second)
+                    onActivityRecognized(it.second, it.third)
                 }
             }
-            else -> onActivityRecognized("")
+            else -> onActivityRecognized(null, null)
         }
     }
 
-    fun compareSpeedAverages(realTimeSpeed: Double, onActivityRecognized: (String) -> Unit) {
+    fun compareSpeedAverages(realTimeSpeed: Double, onActivityRecognized: (String, Double?) -> Unit) {
 
         // if staying still
         if (realTimeSpeed < stillThreshold) {
-            onActivityRecognized("still")
+            onActivityRecognized("still", null)
             return
         }
 
@@ -93,14 +95,14 @@ class DataCompare(private val context: Context) {
         }
 
         when {
-            candidates.size == 1 -> onActivityRecognized(candidates.first().second)
+            candidates.size == 1 -> onActivityRecognized(candidates.first().second, candidates.first().third)
             candidates.size > 1 -> {
                 val closestActivity = candidates.minByOrNull { Math.abs(it.third - realTimeSpeed) }
                 closestActivity?.let {
-                    onActivityRecognized(it.second)
+                    onActivityRecognized(it.second, it.third)
                 }
             }
-            else -> onActivityRecognized("")
+            else -> onActivityRecognized("", null)
         }
     }
 

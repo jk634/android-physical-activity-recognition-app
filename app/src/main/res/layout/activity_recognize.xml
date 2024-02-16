@@ -12,6 +12,6 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:textAlignment="center"
-        android:textSize="30dp" />
+        android:textSize="25dp" />
 
 </LinearLayout>
